@@ -1056,9 +1056,9 @@ static void rwnx_csa_finish(struct work_struct *ws)
         } else
             rwnx_txq_vif_stop(vif, RWNX_TXQ_STOP_CHAN, rwnx_hw);
         spin_unlock_bh(&rwnx_hw->cb_lock);
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)) || defined(BUILD_OPENWRT)
                 cfg80211_ch_switch_notify(vif->ndev, &csa->chandef, 0, 0);
-#elif (LINUX_VERSION_CODE >=KERNEL_VERSION(5, 19, 2))
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 19, 2))
                 cfg80211_ch_switch_notify(vif->ndev, &csa->chandef, 0);
 #else
                 cfg80211_ch_switch_notify(vif->ndev, &csa->chandef);
@@ -3817,7 +3817,7 @@ bool key_flag = false;
  *	when adding a group key.
  */
 static int rwnx_cfg80211_add_key(struct wiphy *wiphy, struct net_device *netdev,
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)) || defined(BUILD_OPENWRT)
                                                                  int link_id,
 #endif
                                  u8 key_index, bool pairwise, const u8 *mac_addr,
@@ -3913,7 +3913,7 @@ static int rwnx_cfg80211_add_key(struct wiphy *wiphy, struct net_device *netdev,
  *
  */
 static int rwnx_cfg80211_get_key(struct wiphy *wiphy, struct net_device *netdev,
-#if (LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION)
+#if (LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION) || defined(BUILD_OPENWRT)
                                                                  int link_id,
 #endif
 
@@ -3932,7 +3932,7 @@ static int rwnx_cfg80211_get_key(struct wiphy *wiphy, struct net_device *netdev,
  *	and @key_index, return -ENOENT if the key doesn't exist.
  */
 static int rwnx_cfg80211_del_key(struct wiphy *wiphy, struct net_device *netdev,
-#if (LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION)
+#if (LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION) || defined(BUILD_OPENWRT)
                                                                  int link_id,
 #endif
 
@@ -3973,7 +3973,7 @@ static int rwnx_cfg80211_del_key(struct wiphy *wiphy, struct net_device *netdev,
  */
 static int rwnx_cfg80211_set_default_key(struct wiphy *wiphy,
                                          struct net_device *netdev,
-#if (LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION)
+#if (LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION) || defined(BUILD_OPENWRT)
                                                                  int link_id,
 #endif
                                          u8 key_index, bool unicast, bool multicast)
@@ -3988,7 +3988,7 @@ static int rwnx_cfg80211_set_default_key(struct wiphy *wiphy,
  */
 static int rwnx_cfg80211_set_default_mgmt_key(struct wiphy *wiphy,
                                               struct net_device *netdev,
-#if (LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION)
+#if (LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION) || defined(BUILD_OPENWRT)
                                                                  int link_id,
 #endif
                                               u8 key_index)
@@ -4078,7 +4078,7 @@ static int rwnx_cfg80211_connect(struct wiphy *wiphy, struct net_device *dev,
         key_params.seq_len = 0;
         key_params.cipher = sme->crypto.cipher_group;
         rwnx_cfg80211_add_key(wiphy, dev,
-#if (LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION)
+#if (LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION) || defined(BUILD_OPENWRT)
                                 0,
 #endif
 	sme->key_idx, false, NULL, &key_params);
@@ -4359,7 +4359,7 @@ static int rwnx_cfg80211_add_station(struct wiphy *wiphy,
             sta->vif_idx = rwnx_vif->vif_index;
             sta->vlan_idx = sta->vif_idx;
             sta->qos = (params->sta_flags_set & BIT(NL80211_STA_FLAG_WME)) != 0;
-#if LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION
+#if (LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION) || defined(BUILD_OPENWRT)
             sta->ht = params->link_sta_params.ht_capa ? 1 : 0;
             sta->vht = params->link_sta_params.vht_capa ? 1 : 0;
 #else
@@ -4770,7 +4770,7 @@ static int rwnx_cfg80211_change_station(struct wiphy *wiphy, struct net_device *
                     sta->vif_idx = rwnx_vif->vif_index;
                     sta->vlan_idx = sta->vif_idx;
                     sta->qos = (params->sta_flags_set & BIT(NL80211_STA_FLAG_WME)) != 0;
-#if LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION
+#if (LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION) || defined(BUILD_OPENWRT)
                 sta->ht = params->link_sta_params.ht_capa ? 1 : 0;
                 sta->vht = params->link_sta_params.vht_capa ? 1 : 0;
 #else
@@ -5045,7 +5045,7 @@ static int rwnx_cfg80211_change_beacon(struct wiphy *wiphy, struct net_device *d
  * * @stop_ap: Stop being an AP, including stopping beaconing.
  */
 //#if (LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION)
-#if LINUX_VERSION_CODE > KERNEL_VERSION(5, 19, 1)
+#if (LINUX_VERSION_CODE > KERNEL_VERSION(5, 19, 1)) || defined(BUILD_OPENWRT)
 static int rwnx_cfg80211_stop_ap(struct wiphy *wiphy, struct net_device *dev, unsigned int link_id)
 #else
 static int rwnx_cfg80211_stop_ap(struct wiphy *wiphy, struct net_device *dev)
@@ -5590,7 +5590,7 @@ static int rwnx_cfg80211_dump_survey(struct wiphy *wiphy, struct net_device *net
 static int rwnx_cfg80211_get_channel(struct wiphy *wiphy,
                                                                          struct wireless_dev *wdev,
 //#if LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION
-#if LINUX_VERSION_CODE > KERNEL_VERSION(5, 19, 1)
+#if (LINUX_VERSION_CODE > KERNEL_VERSION(5, 19, 1)) || defined(BUILD_OPENWRT)
                                                                          unsigned int link_id,
 #endif
                                                     struct cfg80211_chan_def *chandef)
@@ -5941,7 +5941,7 @@ static int rwnx_cfg80211_channel_switch(struct wiphy *wiphy,
     } else {
         INIT_WORK(&csa->work, rwnx_csa_finish);
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)) || defined(BUILD_OPENWRT)
         cfg80211_ch_switch_started_notify(dev, &csa->chandef, 0, params->count, params->block_tx, params->punct_bitmap);
 #elif LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
         cfg80211_ch_switch_started_notify(dev, &csa->chandef, 0, params->count, params->block_tx);

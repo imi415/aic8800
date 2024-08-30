@@ -990,7 +990,7 @@ static inline int rwnx_rx_sm_connect_ind(struct rwnx_hw *rwnx_hw,
 
 	do {
 		bss = cfg80211_get_bss(wdev->wiphy, NULL, rwnx_vif->sta.bssid,
-#if LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION
+#if (LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION) || defined(BUILD_OPENWRT)
 							wdev->u.client.ssid, wdev->u.client.ssid_len,
 #else
 							wdev->ssid, wdev->ssid_len,
@@ -1019,7 +1019,7 @@ static inline int rwnx_rx_sm_connect_ind(struct rwnx_hw *rwnx_hw,
 #else
                 WLAN_CAPABILITY_ESS,
 #endif
-#if LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION
+#if (LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION) || defined(BUILD_OPENWRT)
 				wdev->u.client.ssid_len,
 				wdev->u.client.ssid, 
 #else
@@ -1041,7 +1041,7 @@ static inline int rwnx_rx_sm_connect_ind(struct rwnx_hw *rwnx_hw,
 				rwnx_vif->sta.bssid[0], rwnx_vif->sta.bssid[1], rwnx_vif->sta.bssid[2],
 				rwnx_vif->sta.bssid[3], rwnx_vif->sta.bssid[4], rwnx_vif->sta.bssid[5]);
 
-#if LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION
+#if (LINUX_VERSION_CODE >= HIGH_KERNEL_VERSION) || defined(BUILD_OPENWRT)
 			wdev->u.client.ssid_len = (int)rwnx_vif->sta.ssid_len;
 			memcpy(wdev->u.client.ssid, rwnx_vif->sta.ssid, wdev->u.client.ssid_len);
 #else
@@ -1075,13 +1075,13 @@ static inline int rwnx_rx_sm_connect_ind(struct rwnx_hw *rwnx_hw,
             struct cfg80211_roam_info info;
             memset(&info, 0, sizeof(info));
             if (rwnx_vif->ch_index < NX_CHAN_CTXT_CNT)
-#if LINUX_VERSION_CODE < HIGH_KERNEL_VERSION
+#if (LINUX_VERSION_CODE < HIGH_KERNEL_VERSION) && !defined(BUILD_OPENWRT)
     			info.channel = rwnx_hw->chanctx_table[rwnx_vif->ch_index].chan_def.chan;
 #else
     			info.links[0].channel = rwnx_hw->chanctx_table[rwnx_vif->ch_index].chan_def.chan;
 #endif//LINUX_VERSION_CODE < HIGH_KERNEL_VERSION    
 
-#if LINUX_VERSION_CODE < HIGH_KERNEL_VERSION
+#if (LINUX_VERSION_CODE < HIGH_KERNEL_VERSION) && !defined(BUILD_OPENWRT)
             info.bssid = (const u8 *)ind->bssid.array;
 #else
             info.links[0].bssid = (const u8 *)ind->bssid.array;;
